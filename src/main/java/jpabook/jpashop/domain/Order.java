@@ -21,11 +21,13 @@ public class Order {
     @JoinColumn(name = "member_id") // 연관관계 주인
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // Order가 Delivery의 생명주기를 관리
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
-    @OneToMany(mappedBy = "order")
+    // Order가 OrderItem의 생명주기를 관리
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime orderDate;
