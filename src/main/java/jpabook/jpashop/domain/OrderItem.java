@@ -28,4 +28,10 @@ public class OrderItem {
 
     private int count;
 
+    /**
+     * 비즈니스 로직
+     */
+    public void registerOrder(Order order) {
+        this.order = order;
+    }
 }

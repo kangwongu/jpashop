@@ -21,4 +21,11 @@ public class Delivery {
 
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status;
+
+    /**
+     * 비즈니스 로직
+     */
+    public void registerOrder(Order order) {
+        this.order = order;
+    }
 }

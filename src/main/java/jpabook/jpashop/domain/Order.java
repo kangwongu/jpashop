@@ -36,4 +36,24 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    /**
+     * 연관관계 편의 메소드
+     */
+    // Order - Member
+    public void registerMember(Member member) {
+        this.member = member;
+        member.getOrder().add(this);
+    }
+
+    // Order - OrderItem
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.registerOrder(this);
+    }
+
+    // Order - Delivery
+    public void registerDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.registerOrder(this);
+    }
 }
