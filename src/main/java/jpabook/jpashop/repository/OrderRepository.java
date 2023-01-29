@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 //                    " and m.name like :name " +
 //                    " limit 1000")
 //    List<Order> findAll(OrderSearch orderSearch, @Param("status") OrderStatus orderStatus, @Param("name") String memberName);
+
+
 }
