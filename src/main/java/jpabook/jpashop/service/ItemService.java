@@ -1,5 +1,6 @@
 package jpabook.jpashop.service;
 
+import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,16 @@ public class ItemService {
         return itemRepository.findById(itemId).orElseThrow(
                 () -> new NullPointerException("해당 회원이 존재하지 않습니다.")
         );
+    }
+
+    // 수정
+    @Transactional
+    public void updateItem(Long itemId, String name, int price, int stockQuantity) {
+        Item findItem = itemRepository.findById(itemId).orElseThrow(
+                () -> new NullPointerException("해당 상품이 없습니다.")
+        );
+        findItem.setName(name);
+        findItem.setPrice(price);
+        findItem.setStockQuantity(stockQuantity);
     }
 }

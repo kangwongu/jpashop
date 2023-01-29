@@ -30,7 +30,7 @@ public class ItemController {
         // setter 제거가 좋은 설계
         book.setName(form.getName());
         book.setPrice(form.getPrice());
-        book.setStackQuantity(form.getStockQuantity());
+        book.setStockQuantity(form.getStockQuantity());
         book.setAuthor(form.getAuthor());
         book.setIsbn(form.getIsbn());
 
@@ -49,10 +49,11 @@ public class ItemController {
     public String updateItemForm(@PathVariable("itemId") Long itemId, Model model) {
         Book item = (Book) itemService.findOne(itemId);
         BookForm form = new BookForm();
-        form.setId(item.getId());
+        form.setId(item.getId());tus
+
         form.setName(item.getName());
         form.setPrice(item.getPrice());
-        form.setStockQuantity(item.getStackQuantity());
+        form.setStockQuantity(item.getStockQuantity());
         form.setAuthor(item.getAuthor());
         form.setIsbn(item.getIsbn());
 
@@ -62,15 +63,19 @@ public class ItemController {
 
     @PostMapping("/items/{itemId}/edit")
     public String updateItem(@PathVariable("itemId") Long itemId, @ModelAttribute("form") BookForm form) {
-        Book book = new Book();
-        book.setId(form.getId());
-        book.setName(form.getName());
-        book.setPrice(form.getPrice());
-        book.setStackQuantity(form.getStockQuantity());
-        book.setAuthor(form.getAuthor());
-        book.setIsbn(form.getIsbn());
+        // book은 준영속 엔티티, 변경감지 사용 불가
+//        Book book = new Book();
+//        book.setId(form.getId());
+//        book.setName(form.getName());
+//        book.setPrice(form.getPrice());
+//        book.setStockQuantity(form.getStockQuantity());
+//        book.setAuthor(form.getAuthor());
+//        book.setIsbn(form.getIsbn());
+//
+//        itemService.saveItem(book);
 
-        itemService.saveItem(book);
+        // 변경감지 사용
+        itemService.updateItem(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
 
         return "/items/updateItemForm";
     }
