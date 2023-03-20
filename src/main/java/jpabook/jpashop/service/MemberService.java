@@ -43,4 +43,11 @@ public class MemberService {
         );
     }
 
+    // 업데이트
+    @Transactional
+    public void update(Long id, String name) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new NullPointerException("해당 회원이 존재하지 않아요"));
+        member.setName(name);
+    }
 }
