@@ -47,6 +47,16 @@ public class OrderSimpleApiController {
         return response;
     }
 
+    // 조회 v3, Dto 반환, 페치 조인 -> N+1 문제가 해결됨, 연관관계 객체를 미리 join하기 때문에 불필요한 쿼리가 안나감
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> orderV3() {
+        List<Order> findOrders = orderRepository.findAllWithMemberDelivery();
+        List<SimpleOrderDto> response = findOrders.stream()
+                .map(order -> new SimpleOrderDto(order)).collect(Collectors.toList());
+
+        return response;
+    }
+
     @Data
     static class SimpleOrderDto {
         private Long orderId;

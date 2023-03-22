@@ -11,10 +11,9 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-#        show_sql: true
+        show_sql: true
         format_sql: true
 
-# 로그
 # 로그를 통해 sql 출력
 logging:
   level:
