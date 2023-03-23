@@ -37,10 +37,20 @@ public class OrderApiController {
         return findOrders;
     }
 
-    // 조회 v1, 엔티티 -> dto 반환
+    // 조회 v2, 엔티티 -> dto 반환
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
         List<Order> findOrders = orderRepository.findAll();
+        List<OrderDto> response = findOrders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+        return response;
+    }
+
+    // 조회 v3, dto 반환, 페치 조인으로 쿼리 최적화
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+        List<Order> findOrders = orderRepository.findAllWithItem();
         List<OrderDto> response = findOrders.stream()
                 .map(o -> new OrderDto(o))
                 .collect(Collectors.toList());
