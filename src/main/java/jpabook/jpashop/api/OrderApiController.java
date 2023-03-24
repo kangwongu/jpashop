@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -56,6 +57,19 @@ public class OrderApiController {
                 .collect(Collectors.toList());
         return response;
     }
+
+    // 조회 v3.1, dto 반환, 페치 조인 + 배치사이즈로 쿼리 최적화
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page() {
+        List<Order> findOrders = orderRepository.findAllWithMemberDelivery();
+
+        List<OrderDto> response = findOrders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+        return response;
+    }
+//    @RequestParam(defaultValue = "0") int offset,
+//    @RequestParam(defaultValue = "100") int limit
 
     @Getter
     static class OrderDto {
