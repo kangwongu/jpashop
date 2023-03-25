@@ -7,6 +7,9 @@ import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,16 +63,14 @@ public class OrderApiController {
 
     // 조회 v3.1, dto 반환, 페치 조인 + 배치사이즈로 쿼리 최적화
     @GetMapping("/api/v3.1/orders")
-    public List<OrderDto> ordersV3_page() {
-        List<Order> findOrders = orderRepository.findAllWithMemberDelivery();
+    public Page<OrderDto> ordersV3_page(@RequestParam(defaultValue = "0") int offset,
+                                        @RequestParam(defaultValue = "100") int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Order> findOrders = orderRepository.findAllWithMemberDelivery(pageable);
 
-        List<OrderDto> response = findOrders.stream()
-                .map(o -> new OrderDto(o))
-                .collect(Collectors.toList());
+        Page<OrderDto> response = findOrders.map(o -> new OrderDto(o));
         return response;
     }
-//    @RequestParam(defaultValue = "0") int offset,
-//    @RequestParam(defaultValue = "100") int limit
 
     @Getter
     static class OrderDto {

@@ -2,6 +2,8 @@ package jpabook.jpashop.repository;
 
 
 import jpabook.jpashop.domain.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,13 +16,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllWithMemberDelivery();
 
     // 페치 조인
-//    @Query("select o from Order o " +
-//            "join fetch o.member m " +
-//            "join fetch o.delivery d " +
-//            "offset " +
-//            "limit 100")
-//    List<Order> findAllWithMemberDelivery(@Param("off") int offset,
-//                                          @Param("limit") int limit);
+    @Query(value = "select o from Order o " +
+            "join fetch o.member m " +
+            "join fetch o.delivery d",
+           countQuery = "select count(o) from Order o")
+    Page<Order> findAllWithMemberDelivery(Pageable pageable);
 
     // 페치 조인
     @Query("select distinct o from Order o " +
