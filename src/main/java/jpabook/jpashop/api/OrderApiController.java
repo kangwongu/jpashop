@@ -5,6 +5,9 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     // 조회 v1, 엔티티 직접 반환
     @GetMapping("/api/v1/orders")
@@ -70,6 +74,17 @@ public class OrderApiController {
 
         Page<OrderDto> response = findOrders.map(o -> new OrderDto(o));
         return response;
+    }
+
+    // 조회 v4, dto로 바로 조회 후 반환
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4() {
+        List<OrderQueryDto> result = orderQueryRepository.findOrderQueryDtos();
+        result.forEach(o -> {
+            List<OrderItemQueryDto> orderItems = orderQueryRepository.findOrderItems(o.getOrderId());   // N번 실행
+            o.setOrderItems(orderItems);
+        });
+        return result;
     }
 
     @Getter
