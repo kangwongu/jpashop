@@ -19,4 +19,9 @@ public interface OrderQueryRepository extends JpaRepository<Order, Long> {
             "where oi.order.id = :orderId")
     List<OrderItemQueryDto> findOrderItems(@Param("orderId") Long orderId);
 
+    @Query("select new jpabook.jpashop.repository.order.query.OrderItemQueryDto(oi.order.id, i.name, oi.orderPrice, oi.count) " +
+            "from OrderItem oi " +
+            "join oi.item i " +
+            "where oi.order.id in :orderIds")
+    List<OrderItemQueryDto> findAllByDtoOptimization(@Param("orderIds") List<Long> orderIds);
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -84,6 +85,30 @@ public class OrderApiController {
             List<OrderItemQueryDto> orderItems = orderQueryRepository.findOrderItems(o.getOrderId());   // N번 실행
             o.setOrderItems(orderItems);
         });
+        return result;
+    }
+
+    // 조회 v5, dto로 바로 조회 후 반환 (최적화)
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> ordersV5() {
+        // Order에 관련된 데이터 우선 조회
+        List<OrderQueryDto> result = orderQueryRepository.findOrderQueryDtos();
+
+        // Order의 id만 추출
+        List<Long> orderIds = result.stream()
+                .map(o -> o.getOrderId())
+                .collect(Collectors.toList());
+
+        // Order의 id로 해당하는 OrderItem 데이터 조회 (쿼리를 1번만 날림, v4는 N번, v5는 1번)
+        List<OrderItemQueryDto> orderItems = orderQueryRepository.findAllByDtoOptimization(orderIds);
+
+        // OrderItem을 Order에 세팅하기 위한 준비 (한번에 데이터를 가져온 뒤, 메모리에서 세팅해주는 방식)
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = orderItems.stream()
+                .collect(Collectors.groupingBy(orderItemQueryDto -> orderItemQueryDto.getOrderId()));
+
+        // Order에 OrderItem 세팅
+        result.forEach(o -> o.setOrderItems(orderItemMap.get(o.getOrderId())));
+
         return result;
     }
 
