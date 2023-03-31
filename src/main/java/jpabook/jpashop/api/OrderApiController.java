@@ -5,6 +5,7 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
 import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
@@ -22,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +55,7 @@ public class OrderApiController {
         List<Order> findOrders = orderRepository.findAll();
         List<OrderDto> response = findOrders.stream()
                 .map(o -> new OrderDto(o))
-                .collect(Collectors.toList());
+                .collect(toList());
         return response;
     }
 
@@ -62,7 +65,7 @@ public class OrderApiController {
         List<Order> findOrders = orderRepository.findAllWithItem();
         List<OrderDto> response = findOrders.stream()
                 .map(o -> new OrderDto(o))
-                .collect(Collectors.toList());
+                .collect(toList());
         return response;
     }
 
@@ -97,20 +100,35 @@ public class OrderApiController {
         // Order의 id만 추출
         List<Long> orderIds = result.stream()
                 .map(o -> o.getOrderId())
-                .collect(Collectors.toList());
+                .collect(toList());
 
         // Order의 id로 해당하는 OrderItem 데이터 조회 (쿼리를 1번만 날림, v4는 N번, v5는 1번)
         List<OrderItemQueryDto> orderItems = orderQueryRepository.findAllByDtoOptimization(orderIds);
 
         // OrderItem을 Order에 세팅하기 위한 준비 (한번에 데이터를 가져온 뒤, 메모리에서 세팅해주는 방식)
         Map<Long, List<OrderItemQueryDto>> orderItemMap = orderItems.stream()
-                .collect(Collectors.groupingBy(orderItemQueryDto -> orderItemQueryDto.getOrderId()));
+                .collect(groupingBy(orderItemQueryDto -> orderItemQueryDto.getOrderId()));
 
         // Order에 OrderItem 세팅
         result.forEach(o -> o.setOrderItems(orderItemMap.get(o.getOrderId())));
 
         return result;
     }
+
+    // 조회 v6, dto로 바로 조회 후 반환 (최적화2)
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDto> ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDtoFlat();
+
+        return flats.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(),
+                        e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
+    }
+
 
     @Getter
     static class OrderDto {
@@ -133,7 +151,7 @@ public class OrderApiController {
 //            orderItems = o.getOrderItems();
             orderItems = o.getOrderItems().stream()
                     .map(orderItem -> new OrderItemDto(orderItem))
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
     }
 
