@@ -42,14 +42,14 @@ public class OrderController {
         return "redirect:/orders";
     }
 
-//    @GetMapping("/orders")
-//    public String orderList(@ModelAttribute OrderSearch orderSearch, Model model) {
-//        // 추후 QueryDSL로 수행
-//        List<Order> orders = orderService.findOrders(orderSearch);
-//        model.addAttribute("orders", orders);
-//
-//        return "order/orderList";
-//    }
+    @GetMapping("/orders")
+    public String orderList(@ModelAttribute OrderSearch orderSearch, Model model) {
+        // 추후 QueryDSL로 수행
+        List<Order> orders = orderService.findOrders(orderSearch);
+        model.addAttribute("orders", orders);
+
+        return "order/orderList";
+    }
 
     @PostMapping("/orders/{orderId}/cancel")
     public String cancelOrder(@PathVariable Long orderId) {

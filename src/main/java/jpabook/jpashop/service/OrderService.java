@@ -63,8 +63,8 @@ public class OrderService {
         order.cancel(); // DDD를 통해 엔티티서 작성한 비즈니스 로직을 활용
     }
 
-    // 주문 내역 검색
-//    public List<Order> findOrders(OrderSearch orderSearch) {
-//        return orderRepository.findAllby
-//    }
+//     주문 내역 검색
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAll(orderSearch);
+    }
 }
